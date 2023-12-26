@@ -30,5 +30,18 @@ namespace Comma_Seperate_Value_Client
                 this.Values.Add(new CSVValue(fieldName, values[index]));
             }
         }
+
+        public List<string> GetValues()
+        {
+            if (this.Values != null)
+            {
+                List<string> values = new();
+                foreach (CSVValue value in Values)
+                    values.Add(value.Value);
+                return values;
+            }
+            throw new CSVException("Cannot call GetValues on a CSVLine with no values.");
+
+        }
     }
 }
