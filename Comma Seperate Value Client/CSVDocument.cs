@@ -90,8 +90,7 @@ namespace Comma_Seperate_Value_Client
                         if (insideQuotes)
                         {
                             currentLine ??= new();
-                            currentLine.Append(currentCharacter);
-                            lastCharacter = currentCharacter;
+                            currentLine.Append(currentCharacter);                            
                         }
                         else
                         {
@@ -100,28 +99,33 @@ namespace Comma_Seperate_Value_Client
                                 splitLines.Add(currentLine.ToString());
                                 currentLine = null;
                             }
-                        }                        
+                        }
+                        lastCharacter = currentCharacter;
                         break;
                     case '"':
                         if (lastCharacter == '"')
                         {
                             currentLine ??= new();
                             currentLine.Append(currentCharacter);
+                            insideQuotes = !insideQuotes;
+                            lastCharacter = '~';
                         }
                         else
                         {
                             currentLine ??= new();
                             currentLine.Append(currentCharacter);
                             insideQuotes = !insideQuotes;
+                            lastCharacter = currentCharacter;
                         }                        
                         break;
                     //case char value when value == this.DelimitingCharacter:                        
                     default:
                         currentLine ??= new();
-                        currentLine.Append(currentCharacter);                        
+                        currentLine.Append(currentCharacter);
+                        lastCharacter = currentCharacter;
                         break;
                 }
-                lastCharacter = currentCharacter;
+                
             }
             if (currentLine != null)
                 splitLines.Add(currentLine.ToString());
@@ -188,6 +192,7 @@ namespace Comma_Seperate_Value_Client
                         if (lastCharacter == currentCharacter)
                         {
                             currentValue.Append(currentCharacter);
+                            insideQuotes = !insideQuotes;
                         }
                         else
                         {
