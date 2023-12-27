@@ -96,7 +96,53 @@ namespace Comma_Seperate_Value_Client
             }
         }
 
-        
+        /// <summary>
+        /// Gets a CSV Line where the value for the field matches the supplied parameters.
+        /// An exception will be thrown if more than one line matches. For multiple lines use
+        /// GetCSVLines.
+        /// </summary>
+        /// <param name="field">The field name to check.</param>
+        /// <param name="value">The desired value for the field.</param>
+        /// <returns>Can return a single CSVLine or null if not found.</returns>        
+        public CSVLine? GetCSVLine(string field, string value)
+        {
+            List<CSVLine> matchingLines = GetCSVLinesMatchingFieldAndValue(field, value);
+            if (matchingLines.Count > 1)
+                throw new CSVException($"Multiple matches found for '{field}' = '{value}'");
+            if (matchingLines.Count == 1)
+                return matchingLines[0];
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a list of CSVLines matching the field and value criteria.
+        /// </summary>
+        /// <param name="field">The field name to check.</param>
+        /// <param name="value">The desired value for the field.</param>
+        /// <returns>A list of CSVLines matching the query.</returns>
+        public List<CSVLine> GetCSVLines(string field, string value)
+            => GetCSVLinesMatchingFieldAndValue(field, value);
+
+        /// <summary>
+        /// Gets a list of CSVLines matching the field and value criteria.
+        /// </summary>
+        /// <param name="field">The field name to check.</param>
+        /// <param name="value">The desired value for the field.</param>
+        /// <returns>A list of CSVLines matching the query.</returns>
+        private List<CSVLine> GetCSVLinesMatchingFieldAndValue(string field, string value)
+        {
+            if (this.CSVLines == null)
+                return [];
+            List<CSVLine> output = [];
+            foreach(var line in this.CSVLines)
+            {
+                string lineValue = line.GetValue(field);
+                if (lineValue.Equals(value, StringComparison.OrdinalIgnoreCase))
+                    output.Add(line);
+            }
+            return output;
+        }
+
 
         /// <summary>
         /// Splits the contents down into lines based on the denominator.
