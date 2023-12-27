@@ -59,6 +59,11 @@ namespace Comma_Seperate_Value_Client
             }
         }
 
+        /// <summary>
+        /// Saves the contents of the CSVDocument into a file.
+        /// </summary>
+        /// <param name="fileName">The full path of the file to save.</param>
+        /// <param name="allowOverwrite">If set to false an exception will occur if the file already exists.</param>        
         public void SaveToFile(string fileName, bool allowOverwrite = false)
         {
             if (File.Exists(fileName) && !allowOverwrite)
@@ -67,15 +72,14 @@ namespace Comma_Seperate_Value_Client
             {
                 try
                 {
-                    using (CSVWriter writer = new(fileName))
+                    using CSVWriter writer = new(fileName, this.DelimitingCharacter);
+                    if (this.HasHeader)
+                        writer.WriteHeaders(this.CSVHeaders);
+                    foreach (var line in this.CSVLines)
                     {
-                        if (this.HasHeader)
-                            writer.WriteHeaders(this.CSVHeaders);
-                        foreach (var line in this.CSVLines)
-                        {
-                            writer.WriteLine(line);
-                        }
+                        writer.WriteLine(line);
                     }
+                    writer.Close();
                 }
                 catch (CSVException)
                 {
