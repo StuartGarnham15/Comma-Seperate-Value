@@ -42,22 +42,57 @@ namespace Comma_Seperate_Value_Client
         {
             if (File.Exists(fileName))
             {
-                //try
-                //{
+                try
+                {
                     this.FileName = fileName;
                     string contents = File.ReadAllText(fileName);
                     ConvertStringToCSVDocument(contents);
-                //}
-                //catch (Exception ex)
-                //{
-                //    throw new CSVException($"The file '{fileName}' was found but an issue occurred loading it.", ex);
-                //}
+                }
+                catch (Exception ex)
+                {
+                    throw new CSVException($"The file '{fileName}' was found but an issue occurred loading it.", ex);
+                }
             }
             else
             {
                 throw new CSVException($"The file name '{fileName}' could not be found!");
             }
         }
+
+        public void SaveToFile(string fileName, bool allowOverwrite = false)
+        {
+            if (File.Exists(fileName) && !allowOverwrite)
+                throw new CSVException($"A file with the name '{fileName}' already exists. Choose a new file name or specify allowOverwrite to be true.");
+            if (this.CSVLines != null)
+            {
+                try
+                {
+                    using (CSVWriter writer = new(fileName))
+                    {
+                        if (this.HasHeader)
+                            writer.WriteHeaders(this.CSVHeaders);
+                        foreach (var line in this.CSVLines)
+                        {
+                            writer.WriteLine(line);
+                        }
+                    }
+                }
+                catch (CSVException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new CSVException("An issue occurred when attempting to save the file.", ex);
+                }
+            }
+            else
+            {
+                throw new CSVException($"Cannot write CSV file with no CSV Lines.");
+            }
+        }
+
+        
 
         /// <summary>
         /// Splits the contents down into lines based on the denominator.
